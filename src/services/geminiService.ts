@@ -12,18 +12,23 @@ export interface ChatMessage {
   };
 }
 
-// Load API Key from environment or runtime config
-const EMBEDDED_API_KEY =
-  import.meta.env.VITE_OPENROUTER_API_KEY ||
-  ['sk', 'or', 'v1', '53995920020de170a3bb6ff34c775ff9229e584b85837ee6dddfa538fbc0c7d0'].join('-');
+// Load API Key from environment or local storage
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || '';
 
 export async function askPetroTwinAI(
   prompt: string,
   telemetry: TelemetryData,
   well: WellConfig
 ): Promise<{ reply: string; action?: { label: string; actionType: string; value?: number } }> {
+  if (!OPENROUTER_API_KEY) {
+    return {
+      reply: generateDirectOperationalAdvice(prompt, telemetry, well),
+    };
+  }
+
   try {
     const endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+
 
     const systemInstruction = `
 You are WellSync AI Advisor, a friendly, practical operational assistant for engineers and operators working on petroleum fields (ONGC Baghewala Heavy Oil Field).
@@ -60,7 +65,7 @@ Current Active Well:
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${EMBEDDED_API_KEY}`,
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -84,7 +89,7 @@ Current Active Well:
     const fallbackRes = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${EMBEDDED_API_KEY}`,
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
