@@ -232,6 +232,53 @@ class TimescaleDBService {
     this.records = generateSeedRecords();
     this.saveToStorage();
   }
+
+  /**
+   * Exports all stored records as CSV string and triggers browser download
+   */
+  public downloadCsv() {
+    const headers = ['Time', 'Well ID', 'Reservoir Temp (°C)', 'Tubing Pressure (bar)', 'Pump Speed (SPM)', 'Viscosity (cP)', 'Fluid Level (m)', 'Oil Rate (bbl/d)', 'Trigger Source', 'Delta Note'];
+    const rows = this.records.map((r) => [
+      `"${r.time}"`,
+      `"${r.wellId}"`,
+      r.temperature,
+      r.pressure,
+      r.spm,
+      r.viscosity,
+      r.fluidLevel,
+      r.flowRate,
+      `"${r.trigger.replace(/"/g, '""')}"`,
+      `"${(r.deltaNote || '').replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `wellsync_telemetry_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Exports all stored records as JSON file and triggers browser download
+   */
+  public downloadJson() {
+    const jsonStr = JSON.stringify(this.records, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `wellsync_records_${new Date().toISOString().slice(0, 10)}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
 }
 
 export const timescaleDB = new TimescaleDBService();
+

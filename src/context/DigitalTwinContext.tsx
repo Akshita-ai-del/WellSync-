@@ -158,9 +158,35 @@ export function generate52Wells(): Record<string, WellConfig> {
 
 const DigitalTwinContext = createContext<DigitalTwinContextType | null>(null);
 
+const WELLS_STORAGE_KEY = 'petrotwin_wells_v1';
+
 export function DigitalTwinProvider({ children }: { children: React.ReactNode }) {
-  const [wells, setWells] = useState<Record<string, WellConfig>>(() => generate52Wells());
+  const [wells, setWells] = useState<Record<string, WellConfig>>(() => {
+    try {
+      const saved = localStorage.getItem(WELLS_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && Object.keys(parsed).length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to load saved wells from localStorage:', e);
+    }
+    return generate52Wells();
+  });
+
+  // Automatically save wells to localStorage whenever modified or newly added
+  useEffect(() => {
+    try {
+      localStorage.setItem(WELLS_STORAGE_KEY, JSON.stringify(wells));
+    } catch (e) {
+      console.warn('Failed to save wells to localStorage:', e);
+    }
+  }, [wells]);
+
   const [activeWellId, setActiveWellId] = useState<string>('BW-07');
+
   const [isStreaming, setIsStreaming] = useState(true);
   const [lastDashboardSyncNotice, setLastDashboardSyncNotice] = useState<string | null>(null);
   const [historicalLogs, setHistoricalLogs] = useState<HistoricalTelemetryRecord[]>(() =>

@@ -244,9 +244,9 @@ export function AICopilotView() {
             </button>
             <button
               className={styles.infoBtn}
-              onClick={() => handleSend('CSS me steam ka temperature kitna lena chahiye aur injection duration kitni ho?')}
+              onClick={() => handleSend('Explain simply: CSS steam injection temperature aur duration kaise kaam karta hai?')}
             >
-              Physics Derivation 📐
+              Simple Explanation 💡
             </button>
           </div>
         </div>
@@ -290,9 +290,9 @@ export function AICopilotView() {
             </button>
             <button
               className={styles.infoBtn}
-              onClick={() => handleSend('Casing pressure aur choke size adjust karne ke kya guidelines hain?')}
+              onClick={() => handleSend('Explain simply: Casing pressure aur choke size adjust karne ke easy tips kya hain?')}
             >
-              Choke Guidelines 📐
+              Simple Guidelines 💡
             </button>
           </div>
         </div>

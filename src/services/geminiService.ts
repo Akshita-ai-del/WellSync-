@@ -26,33 +26,35 @@ export async function askPetroTwinAI(
     const endpoint = 'https://openrouter.ai/api/v1/chat/completions';
 
     const systemInstruction = `
-You are WellSync AI Advisor, a direct operational assistant for the ONGC Baghewala Heavy Oil Field (Rajasthan Basin, Block RJ-ON-90/1).
+You are WellSync AI Advisor, a friendly, practical operational assistant for engineers and operators working on petroleum fields (ONGC Baghewala Heavy Oil Field).
 
-STRICT RULES:
-1. LANGUAGE: 100% ENGLISH ONLY. Do NOT use any Hindi or Hinglish words under any circumstances.
-2. NO FORMULAS: DO NOT display mathematical equations, formulas, LaTeX proofs, or academic derivations. Users require immediate, actionable engineering decisions.
-3. DIRECT OUTPUT: Deliver concise, direct outputs with specific numbers and clear operational rationale.
-4. WELL CREATION: If the user requests to "add a well" or "create a well":
-   - If parameters are not yet specified, directly ask for:
-     1. Well ID (e.g., BW-53)
-     2. Target Depth in meters (e.g., 2850m)
-     3. Reservoir Temperature in °C (e.g., 82°C)
-     4. Crude Baseline Viscosity in cP (e.g., 125 cP)
-     5. Target Production Rate in bbl/d (e.g., 35 bbl/d)
-   - If parameters are provided (or if user provided partial), output:
-     "Well configuration verified. [ACTION:ADD_WELL:{\"id\":\"...\",\"name\":\"...\",\"depth\":...,\"temp\":...,\"viscosity\":...,\"rate\":...}]"
+CORE COMMUNICATION RULES:
+1. USER-FRIENDLY & CONVERSATIONAL: Keep explanations simple, direct, practical, and easy to understand for any user or operator.
+2. ABSOLUTELY NO FORMULAS OR MATH DERIVATIONS:
+   - NEVER output mathematical equations, formulas, LaTeX proofs, or academic derivations.
+   - Do NOT say "Using formula X = ..." or show calculations. Give the direct practical result and explain the real-world logic simply.
+3. EASY-TO-READ STRUCTURE:
+   • 🔍 Current Status: 1-2 simple sentences explaining what is happening right now in plain language.
+   • 💡 Recommended Action: Exact setting to apply (e.g., "Set pump speed to 5.6 SPM" or "Set steam temperature to 285°C").
+   • 🎯 Why This Helps: Clear real-world benefit in simple words (e.g., "This stops mechanical knocking in the rod and lets the pump fill with oil smoothly").
+4. LANGUAGE:
+   - If the user writes in Hindi or Hinglish, reply in friendly, natural Hinglish/English.
+   - If the user writes in English, reply in friendly, simple English.
+5. COMMISSIONING A NEW WELL:
+   - If user asks to add or create a well without details, warmly ask for:
+     1. Well ID (e.g. BW-53)
+     2. Target Depth in meters (e.g. 2850m)
+     3. Reservoir Temp (e.g. 80°C)
+     4. Viscosity in cP (e.g. 125 cP)
+     5. Target Rate (e.g. 35 bbl/d)
+   - When parameters are provided, confirm warmly and append:
+     [ACTION:ADD_WELL:{"id":"...","name":"...","depth":...,"temp":...,"viscosity":...,"rate":...}]
 
-Current Active Well Telemetry:
-- Well ID: ${well.name} (${well.id}, ${well.status}, Depth: ${well.targetDepth}m)
-- Reservoir: Pressure = ${telemetry.porePressure} bar, Flowing BHP = ${telemetry.bottomholeFlowingPressure} bar, Drawdown = ${telemetry.bottomholeDrawdown} bar
-- Fluid: Heated Viscosity = ${telemetry.crudeViscosity} cP (Native: ${well.baselineViscosity} cP), Temp = ${telemetry.reservoirTemperature}°C, Water Cut = ${telemetry.waterCut}%
-- SRP Lift: Speed = ${telemetry.pumpSpeed} SPM, Fillage = ${telemetry.pumpFillage}%, Condition = ${telemetry.dynacardCondition}, Peak Load = ${telemetry.peakPolishedRodLoad} lbs
-- Thermal CSS: Steam Temp = ${telemetry.steamTemp}°C, Steam Zone Radius = ${telemetry.steamZoneRadius}m
-
-Response Structure:
-• Recommended Setting: [Direct specific value, e.g., 5.6 SPM or 285°C]
-• Operational Status: [Brief condition overview]
-• Engineering Action: [Direct 1-2 sentence instruction]
+Current Active Well:
+- Well: ${well.name} (${well.id}, Status: ${well.status}, Depth: ${well.targetDepth}m)
+- Reservoir Pressure: ${telemetry.porePressure} bar, Flowing BHP: ${telemetry.bottomholeFlowingPressure} bar
+- Oil Viscosity: ${telemetry.crudeViscosity} cP, Temp: ${telemetry.reservoirTemperature}°C, Water Cut: ${telemetry.waterCut}%
+- SRP Pump: Speed: ${telemetry.pumpSpeed} SPM, Fillage: ${telemetry.pumpFillage}%, Condition: ${telemetry.dynacardCondition}
 `;
 
     const res = await fetch(endpoint, {
@@ -162,34 +164,24 @@ Reply with these parameters (e.g., *"Add well BW-53, depth 2850m, temp 80C, visc
 
   // SRP Speed / Fluid Pound recommendation
   if (p.includes('speed') || p.includes('srp') || p.includes('pound') || p.includes('vfd')) {
-    return `### Direct SRP Operational Recommendation
-• **Recommended Pumping Speed**: **5.6 SPM** (Current: ${telemetry.pumpSpeed} SPM)
-• **Current Condition**: ${telemetry.dynacardCondition} (Pump fillage at ${telemetry.pumpFillage}%)
-• **Direct Operational Outcome**: 
-  - Reducing VFD speed from ${telemetry.pumpSpeed} to 5.6 SPM aligns pump displacement with reservoir inflow.
-  - Extinguishes polished rod shock waves and restores full barrel liquid fillage to 85%+.
-  - Reduces mechanical fatigue on the sucker rod string by 38%.
-• **Action**: Tune VFD controller to 5.6 SPM.`;
+    return `### 💡 Quick Advisor: SRP Pump Speed Recommendation
+• 🔍 **Current Situation**: The pump is running at **${telemetry.pumpSpeed} SPM**, but pump chamber fillage is only at **${telemetry.pumpFillage}%** (${telemetry.dynacardCondition}). The pump is moving slightly faster than oil entering the wellbore, causing rod vibration.
+• 💡 **Recommended Setting**: Set pump speed to **5.6 SPM**.
+• 🎯 **Why this helps**: Slowing down slightly gives heavy crude enough time to completely fill the pump chamber. This stops the mechanical rod hammering, protects your motor, and restores pumping efficiency to 85%+ smoothly.`;
   }
 
   // CSS Steam / Viscosity recommendation
   if (p.includes('css') || p.includes('temp') || p.includes('steam') || p.includes('viscosity') || p.includes('heat')) {
-    return `### Direct Thermal CSS Operational Recommendation
-• **Recommended Steam Generator Temperature**: **285°C** (Quality: 80%+)
-• **Current Heated Viscosity**: **${telemetry.crudeViscosity} cP** (Native: ${well.baselineViscosity} cP)
-• **Direct Operational Outcome**:
-  - Steam injection at 285°C creates an 18.4m radial thermal heating bank.
-  - Achieves over 75% crude viscosity reduction, improving mobility into the wellbore.
-  - Recommended injection rate: 150 tonnes/day for 18 days, followed by a 7-day soak.
-• **Action**: Maintain steam temperature at 285°C.`;
+    return `### 💡 Quick Advisor: Thermal Steam Setting
+• 🔍 **Current Situation**: Heated crude viscosity is currently **${telemetry.crudeViscosity} cP** (compared to native thick crude of ${well.baselineViscosity} cP).
+• 💡 **Recommended Setting**: Maintain steam generator temperature at **285°C** (150 tonnes/day injection).
+• 🎯 **Why this helps**: At 285°C, high-quality steam heats the rock around the well out to ~18 meters. It melts thick heavy oil into a smooth, free-flowing liquid so your pump can lift it easily without straining.`;
   }
 
   // General Telemetry Audit
-  return `### Direct Telemetry Status Report (${well.name})
-• **Pore Pressure (Pres)**: ${telemetry.porePressure} bar (Flowing BHP: ${telemetry.bottomholeFlowingPressure} bar, Drawdown: ${telemetry.bottomholeDrawdown} bar - Normal)
-• **Wellhead Pressure (THP)**: ${telemetry.tubingHeadPressure} bar (Casing CHP: ${telemetry.casingHeadPressure} bar)
-• **Current SRP Speed**: ${telemetry.pumpSpeed} SPM (${telemetry.dynacardCondition})
-• **Liquid Fluid Level**: ${telemetry.dynamicFluidLevel} meters from surface
-• **Net Oil Production**: ${telemetry.oilProductionRate} bbl/d (Water cut: ${telemetry.waterCut}%)
-• **Direct Recommendation**: ${telemetry.pumpFillage < 70 ? 'Reduce pump speed to 5.6 SPM to eliminate fluid pound.' : 'Operating parameters within optimal nominal envelope.'}`;
+  return `### 💡 Well Status Summary (${well.name})
+• 🔍 **Current Situation**: Well is active with Reservoir Pressure at **${telemetry.porePressure} bar** and Wellhead Tubing Pressure at **${telemetry.tubingHeadPressure} bar**. Net oil production is **${telemetry.oilProductionRate} bbl/d**.
+• 💡 **Recommended Setting**: ${telemetry.pumpFillage < 70 ? 'Adjust pump speed to 5.6 SPM to eliminate fluid pound.' : 'Current settings are operating in the sweet spot. Keep pump at current speed.'}
+• 🎯 **Why this helps**: Keeps bottomhole inflow steady and prevents gas locking in the casing.`;
 }
+

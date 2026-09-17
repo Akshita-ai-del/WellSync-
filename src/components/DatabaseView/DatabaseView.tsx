@@ -4,7 +4,7 @@ import { timescaleDB } from '../../database/timescaleService';
 import styles from './DatabaseView.module.css';
 
 export function DatabaseView() {
-  const { historicalLogs, wells } = useDigitalTwin();
+  const { historicalLogs, wells, directInsertTelemetryRecord, activeWell } = useDigitalTwin();
 
   const [activeQuery, setActiveQuery] = useState(
     "SELECT time, well_id, temp_c, pressure_bar, spm, viscosity_cp, trigger_source FROM well_telemetry WHERE well_id = 'BW-07' ORDER BY time DESC LIMIT 20;"
@@ -14,6 +14,18 @@ export function DatabaseView() {
     timescaleDB.executeSql(activeQuery)
   );
 
+  // New Record Form State
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [recordWellId, setRecordWellId] = useState(activeWell.id);
+  const [recordTemp, setRecordTemp] = useState('78.5');
+  const [recordPress, setRecordPress] = useState('148.2');
+  const [recordSpm, setRecordSpm] = useState('5.8');
+  const [recordVisco, setRecordVisco] = useState('32.0');
+  const [recordFluid, setRecordFluid] = useState('1250');
+  const [recordRate, setRecordRate] = useState('36.5');
+  const [recordNote, setRecordNote] = useState('Manual Operator Inspection');
+  const [successToast, setSuccessToast] = useState<string | null>(null);
+
   const totalWellCount = Object.keys(wells).length;
   const totalRecordCount = historicalLogs.length;
 
@@ -22,6 +34,36 @@ export function DatabaseView() {
     if (sqlToRun) setActiveQuery(sqlToRun);
     const result = timescaleDB.executeSql(query);
     setQueryResult(result);
+  };
+
+  const handleSaveCustomRecord = (e: React.FormEvent) => {
+    e.preventDefault();
+    const tempNum = parseFloat(recordTemp) || 78.0;
+    const pressNum = parseFloat(recordPress) || 145.0;
+    const spmNum = parseFloat(recordSpm) || 5.8;
+    const viscoNum = parseFloat(recordVisco) || 35.0;
+    const fluidNum = parseFloat(recordFluid) || 1250;
+    const rateNum = parseFloat(recordRate) || 35.0;
+
+    directInsertTelemetryRecord({
+      wellId: recordWellId,
+      temperature: tempNum,
+      pressure: pressNum,
+      spm: spmNum,
+      viscosity: viscoNum,
+      fluidLevel: fluidNum,
+      flowRate: rateNum,
+      trigger: 'Manual User Record',
+      deltaNote: recordNote || 'Manual Entry',
+    });
+
+    // Refresh query results so user immediately sees their record in the table
+    const result = timescaleDB.executeSql(activeQuery);
+    setQueryResult(result);
+
+    setSuccessToast(`✓ Record for ${recordWellId} successfully saved to persistent database!`);
+    setShowAddForm(false);
+    setTimeout(() => setSuccessToast(null), 4000);
   };
 
   const sampleQueries = useMemo(
@@ -50,13 +92,176 @@ export function DatabaseView() {
           <div className={styles.badgeRow}>
             <span className={styles.titlePill}>DATABASE ENGINE</span>
             <span className={styles.subPill}>POSTGRESQL 16 + TIMESCALEDB</span>
+            <span className={styles.subPill} style={{ color: 'var(--green)', borderColor: 'rgba(34,197,94,0.3)' }}>💾 AUTO-SAVED LOCALLY</span>
           </div>
           <span className={styles.sectionTitle}>TimescaleDB Telemetry Vault & Query Console</span>
           <span className={styles.subTitle}>
-            Partitioned time-series hypertable (`well_telemetry`) with 1-minute continuous rollups
+            Partitioned time-series hypertable (`well_telemetry`) with persistent local storage
           </span>
         </div>
+
+        {/* Action Buttons for Export & Insertion */}
+        <div className={styles.actionBtnsGroup}>
+          <button
+            className={styles.actionBtn}
+            onClick={() => timescaleDB.downloadCsv()}
+            title="Download all saved records as CSV file"
+          >
+            📥 Export CSV
+          </button>
+          <button
+            className={styles.actionBtn}
+            onClick={() => timescaleDB.downloadJson()}
+            title="Download all saved records as JSON file"
+          >
+            📥 Export JSON
+          </button>
+          <button
+            className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
+            onClick={() => setShowAddForm((v) => !v)}
+          >
+            {showAddForm ? '✕ Close Form' : '➕ Add Custom Record'}
+          </button>
+        </div>
       </div>
+
+      {/* Success Notification */}
+      {successToast && (
+        <div className={styles.successToast}>
+          <span>{successToast}</span>
+        </div>
+      )}
+
+      {/* Add Custom Record Panel */}
+      {showAddForm && (
+        <form className={styles.addRecordCard} onSubmit={handleSaveCustomRecord}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--accent)' }}>
+              📝 Insert New Telemetry Record (Saved to Permanent Storage)
+            </span>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+              Data will be logged into TimescaleDB and available across reloads
+            </span>
+          </div>
+
+          <div className={styles.formGrid}>
+            <div className={styles.formField}>
+              <label className={styles.formLabel}>Well ID</label>
+              <select
+                className={styles.formInput}
+                value={recordWellId}
+                onChange={(e) => setRecordWellId(e.target.value)}
+              >
+                {Object.keys(wells).map((id) => (
+                  <option key={id} value={id}>
+                    {id}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.formField}>
+              <label className={styles.formLabel}>Reservoir Temp (°C)</label>
+              <input
+                className={styles.formInput}
+                type="number"
+                step="0.1"
+                value={recordTemp}
+                onChange={(e) => setRecordTemp(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.formField}>
+              <label className={styles.formLabel}>Tubing Pressure (bar)</label>
+              <input
+                className={styles.formInput}
+                type="number"
+                step="0.1"
+                value={recordPress}
+                onChange={(e) => setRecordPress(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.formField}>
+              <label className={styles.formLabel}>Pump Speed (SPM)</label>
+              <input
+                className={styles.formInput}
+                type="number"
+                step="0.1"
+                value={recordSpm}
+                onChange={(e) => setRecordSpm(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.formField}>
+              <label className={styles.formLabel}>Viscosity (cP)</label>
+              <input
+                className={styles.formInput}
+                type="number"
+                step="0.1"
+                value={recordVisco}
+                onChange={(e) => setRecordVisco(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.formField}>
+              <label className={styles.formLabel}>Fluid Level (m)</label>
+              <input
+                className={styles.formInput}
+                type="number"
+                step="1"
+                value={recordFluid}
+                onChange={(e) => setRecordFluid(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.formField}>
+              <label className={styles.formLabel}>Oil Flow (bbl/d)</label>
+              <input
+                className={styles.formInput}
+                type="number"
+                step="0.1"
+                value={recordRate}
+                onChange={(e) => setRecordRate(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.formField} style={{ gridColumn: 'span 2' }}>
+              <label className={styles.formLabel}>Operational Note / Trigger</label>
+              <input
+                className={styles.formInput}
+                type="text"
+                placeholder="e.g. Field Engineer Inspection / Routine Survey"
+                value={recordNote}
+                onChange={(e) => setRecordNote(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className={styles.formActions}>
+            <button
+              type="button"
+              className={styles.actionBtn}
+              onClick={() => setShowAddForm(false)}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
+            >
+              💾 Save Record to Database
+            </button>
+          </div>
+        </form>
+      )}
+
 
       {/* Hypertable Status Grid */}
       <div className={styles.statusGrid}>
