@@ -1,0 +1,596 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: rgba(8, 12, 21, 0.5);
+  position: relative;
+}
+
+.syncNoticeBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(0, 242, 155, 0.12);
+  border-bottom: 1px solid rgba(0, 242, 155, 0.3);
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 600;
+  animation: slideDown 0.3s ease-out;
+  z-index: 10;
+}
+
+.syncNoticeText {
+  letter-spacing: 0.2px;
+}
+
+.syncNoticeClose {
+  color: var(--green);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 6px;
+  opacity: 0.75;
+}
+
+.syncNoticeClose:hover {
+  opacity: 1;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.titleBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(13, 19, 33, 0.6);
+  backdrop-filter: var(--mac-blur);
+  flex-shrink: 0;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.titleLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.badgeRow {
+  display: flex;
+  gap: 6px;
+}
+
+.titlePill {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+}
+
+.subPill {
+  font-size: 9px;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+}
+
+.subTitle {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.historyToggleBtn {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.historyToggleBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.historyToggleActive {
+  background: var(--accent-dim);
+  border-color: rgba(0, 229, 255, 0.4);
+  color: var(--accent);
+}
+
+/* History Drawer Overlay in TwinView */
+.historyDrawer {
+  background: rgba(10, 15, 26, 0.95);
+  backdrop-filter: var(--mac-blur);
+  border-bottom: 1px solid var(--border-bright);
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: slideDown 0.25s ease-out;
+  z-index: 15;
+}
+
+.drawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drawerTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.drawerSub {
+  display: block;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.drawerClose {
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.drawerClose:hover {
+  color: var(--text-primary);
+}
+
+.drawerTableWrapper {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.drawerTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  text-align: left;
+}
+
+.drawerTable th {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px 10px;
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.drawerTable td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.drawerTable tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.wellIdCell {
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+
+.monoCell {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.tempCell {
+  font-family: var(--font-mono);
+  color: var(--yellow);
+  font-weight: 600;
+}
+
+.spmCell {
+  font-family: var(--font-mono);
+  color: var(--purple);
+  font-weight: 700;
+}
+
+.viscoCell {
+  font-family: var(--font-mono);
+  color: var(--orange);
+}
+
+.triggerCell {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 10px;
+}
+
+.deltaNote {
+  color: var(--accent);
+  font-style: italic;
+  font-size: 9px;
+}
+
+.pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.centerContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.svgWrapper {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 8px 16px;
+}
+
+.schematicSvg {
+  width: 100%;
+  max-width: 580px;
+  height: auto;
+  max-height: calc(100% - 4px);
+  filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.08));
+}
+
+.metricsRow {
+  display: flex;
+  width: 100%;
+  border-top: 1px solid var(--border);
+  background: rgba(10, 15, 26, 0.85);
+  backdrop-filter: var(--mac-blur);
+  flex-shrink: 0;
+}
+
+.metricCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 8px;
+  gap: 2px;
+  border-right: 1px solid var(--border);
+  transition: background var(--transition);
+}
+
+.metricCard:last-child {
+  border-right: none;
+}
+
+.metricCard:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.metricLabel {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+.metricVal {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.metricVal small {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.metricSub {
+  font-size: 9px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+/* Direct DB Record Button */
+.directInsertBtn {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 229, 255, 0.12);
+  border: 1px solid rgba(0, 229, 255, 0.4);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.directInsertBtn:hover {
+  background: rgba(0, 229, 255, 0.22);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+}
+
+/* Row Action Buttons in History Drawer */
+.rowActionBtn {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.rowActionBtn:hover {
+  background: var(--accent-dim);
+  border-color: rgba(0, 229, 255, 0.35);
+  color: var(--accent);
+}
+
+/* Glassmorphic Modal Overlays */
+.modalOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 7, 14, 0.82);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modalCard {
+  width: 100%;
+  max-width: 580px;
+  background: rgba(13, 19, 33, 0.96);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-md);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.modalTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modalTitleBadge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid rgba(0, 242, 155, 0.3);
+}
+
+.modalBody {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formGroupFull {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.formInput,
+.formSelect {
+  background: rgba(6, 10, 18, 0.7);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font-size: 11px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.formInput:focus,
+.formSelect:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.25);
+}
+
+.sqlPreviewBox {
+  background: rgba(6, 10, 18, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  line-height: 1.4;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.sqlLabel {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  display: block;
+  font-weight: 600;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.cancelBtn {
+  font-size: 11px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.cancelBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.commitBtn {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 16px;
+  background: var(--accent);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: #050811;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.commitBtn:hover {
+  background: #26edff;
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.4);
+}
+
+/* Point-in-time comparison cards */
+.pitComparisonGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.pitCard {
+  background: rgba(6, 10, 18, 0.6);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pitCardTitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 4px;
+}
+
+.pitParamRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+.pitParamLabel {
+  color: var(--text-muted);
+}
+
+.pitParamVal {
+  font-weight: 600;
+  color: var(--text-primary);
+}

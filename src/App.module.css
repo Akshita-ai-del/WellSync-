@@ -1,0 +1,109 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-app);
+  transition: background var(--duration-slow) var(--ease-default);
+}
+
+/* ─── Workspace ──────────────────────────────────────────── */
+.workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ─── List panel ─────────────────────────────────────────── */
+.listPanel {
+  width: var(--list-width);
+  min-width: var(--list-width);
+  max-width: var(--list-width);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-sidebar);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
+  transition: background var(--duration-slow) var(--ease-default),
+              border-color var(--duration-slow) var(--ease-default);
+}
+
+/* ─── Resize divider ─────────────────────────────────────── */
+.resizer {
+  width: 1px;
+  background: var(--border-subtle);
+  flex-shrink: 0;
+  cursor: col-resize;
+  transition: background var(--duration-fast);
+  position: relative;
+}
+
+.resizer:hover { background: var(--accent); }
+
+/* ─── Detail panel ───────────────────────────────────────── */
+.detailPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-surface);
+  min-width: 0;
+  transition: background var(--duration-slow) var(--ease-default);
+}
+
+/* ─── Mobile back button ─────────────────────────────────── */
+.backBtn {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-accent);
+  background: var(--bg-bar);
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  height: 34px;
+  flex-shrink: 0;
+  transition: background var(--duration-fast);
+}
+.backBtn:hover { background: var(--bg-hover); }
+
+/* ─── Mobile layout ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .listPanel {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    border-right: none;
+  }
+
+  .detailPanel {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    transform: translateX(100%);
+    transition: transform var(--duration-normal) var(--ease-default);
+  }
+
+  /* Show detail by overriding transform via mobileHide logic */
+  .detailPanel:not(.mobileHide) {
+    transform: translateX(0);
+  }
+
+  .mobileHide {
+    display: none !important;
+  }
+
+  .backBtn { display: flex; }
+  .resizer { display: none; }
+}

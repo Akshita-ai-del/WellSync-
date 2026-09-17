@@ -1,0 +1,118 @@
+.sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  background: rgba(10, 15, 26, 0.7);
+  backdrop-filter: var(--mac-blur);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 12px;
+  user-select: none;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sectionHeader {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  padding: 0 8px;
+  text-transform: uppercase;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all var(--transition);
+  text-align: left;
+}
+
+.item:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.item.active {
+  color: #fff;
+  background: rgba(0, 229, 255, 0.14);
+  font-weight: 600;
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.12) inset;
+}
+
+.label {
+  letter-spacing: -0.1px;
+}
+
+.badge {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.badgeActive {
+  background: rgba(0, 229, 255, 0.25);
+  color: var(--accent);
+}
+
+.wellFooter {
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.wellCard {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wellLabel {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.6px;
+}
+
+.wellName {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.wellDepth {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}

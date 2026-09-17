@@ -1,0 +1,45 @@
+/* ── App Shell Layout (macOS Lucid) ─────────────────────────── */
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--bg-base);
+  background-image: var(--bg-base-radial);
+  color: var(--text-primary);
+}
+
+.shell-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.shell-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  background: transparent;
+  min-height: 0;
+  position: relative;
+}
+
+.shell-center {
+  flex: 1;
+  overflow-y: auto;
+  background: rgba(8, 12, 21, 0.45);
+  backdrop-filter: var(--mac-blur);
+  position: relative;
+  min-width: 0;
+}
+
+.shell-right {
+  width: var(--right-w);
+  flex-shrink: 0;
+  background: rgba(13, 19, 33, 0.75);
+  backdrop-filter: var(--mac-blur);
+  overflow-y: auto;
+  border-left: 1px solid var(--border);
+}

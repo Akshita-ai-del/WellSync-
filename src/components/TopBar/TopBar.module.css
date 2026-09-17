@@ -1,0 +1,147 @@
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--topbar-h);
+  padding: 0 16px;
+  background: rgba(13, 19, 33, 0.75);
+  backdrop-filter: var(--mac-blur);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 16px;
+  z-index: 20;
+  user-select: none;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+
+
+.brandGroup {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.brandTitle {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #fff;
+}
+
+
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.bcItem {
+  color: var(--text-secondary);
+}
+
+.bcSep {
+  color: var(--text-dim);
+}
+
+.bcActive {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.statPill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  min-width: 80px;
+}
+
+.statLabel {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+.statVal {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.statVal small {
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.streamBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.streamLive {
+  color: var(--green);
+  background: var(--green-dim);
+  border-color: rgba(0, 242, 155, 0.3);
+}
+
+.streamPaused {
+  color: var(--yellow);
+  background: var(--yellow-dim);
+  border-color: rgba(255, 200, 55, 0.3);
+}
+
+.streamDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.clockBox {
+  padding-left: 10px;
+  border-left: 1px solid var(--border);
+}
+
+.clockText {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--accent);
+}

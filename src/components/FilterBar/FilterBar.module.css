@@ -1,0 +1,173 @@
+.bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-sidebar);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  flex-shrink: 0;
+}
+
+/* ─── Search ─────────────────────────────────────────────── */
+.searchWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-3);
+  font-size: 15px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+  line-height: 1;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.searchInput {
+  width: 100%;
+  height: 30px;
+  padding: 0 var(--space-8) 0 var(--space-8);
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-default),
+              background var(--duration-fast) var(--ease-default),
+              box-shadow var(--duration-fast) var(--ease-default);
+  -webkit-appearance: none;
+  appearance: none;
+  user-select: text;
+}
+
+.searchInput::placeholder { color: var(--text-tertiary); }
+.searchInput:focus {
+  border-color: var(--border-focus);
+  background: var(--bg-surface);
+  box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+/* Remove default search clear button */
+.searchInput::-webkit-search-cancel-button { display: none; }
+
+.clearBtn {
+  position: absolute;
+  right: var(--space-2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  font-size: 10px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+.clearBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* ─── Dropdowns ──────────────────────────────────────────── */
+.dropdowns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.selectWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 80px;
+}
+
+.selectWrap.wide { min-width: 130px; flex: 2; }
+
+.selectLabel {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.select {
+  height: 26px;
+  padding: 0 var(--space-2);
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color var(--duration-fast), background var(--duration-fast);
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23aeaeb2' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  padding-right: var(--space-5);
+}
+
+.select:focus { border-color: var(--border-focus); }
+
+.select.active {
+  border-color: var(--accent);
+  background-color: var(--accent-bg);
+  color: var(--text-accent);
+}
+
+/* ─── Reset button ───────────────────────────────────────── */
+.resetBtn {
+  height: 26px;
+  padding: 0 var(--space-3);
+  background: var(--diff-hard-bg);
+  border: 1px solid var(--diff-hard);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--diff-hard);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-end;
+  white-space: nowrap;
+  transition: opacity var(--duration-fast);
+}
+
+.resetBtn:hover { opacity: 0.78; }
+
+.resetBadge {
+  background: var(--diff-hard);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Mobile ─────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .bar { padding: var(--space-2) var(--space-3); }
+  .selectWrap.wide { flex: 1 1 100%; }
+}

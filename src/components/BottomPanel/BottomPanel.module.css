@@ -1,0 +1,205 @@
+.panel {
+  display: flex;
+  align-items: stretch;
+  height: var(--bottombar-h);
+  background: rgba(10, 15, 26, 0.85);
+  backdrop-filter: var(--mac-blur);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  padding: 10px 16px;
+  gap: 16px;
+  user-select: none;
+}
+
+.chartSection {
+  flex: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  gap: 2px;
+}
+
+.tab {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  color: var(--text-muted);
+}
+
+.tab:hover {
+  color: var(--text-primary);
+}
+
+.tabActive {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.chartMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chartUnit {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.liveTag {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--green);
+  background: var(--green-dim);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  letter-spacing: 0.5px;
+}
+
+.chartBody {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  min-height: 0;
+}
+
+.sparkline {
+  width: 100%;
+  height: 100%;
+  max-height: 64px;
+}
+
+.separator {
+  width: 1px;
+  background: var(--border-subtle);
+}
+
+.miniChartSection {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.miniHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.miniTitle {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.miniVal {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+
+.miniBody {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+}
+
+.auditSection {
+  flex: 1.1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 260px;
+}
+
+.auditHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.auditTitle {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.auditSavings {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green);
+  font-family: var(--font-mono);
+}
+
+.auditGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.auditRow {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 0.2fr 1fr 0.9fr;
+  align-items: center;
+  font-size: 11px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle);
+}
+
+.auditMetric {
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+.auditBefore {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.auditArrow {
+  color: var(--text-dim);
+  text-align: center;
+  font-size: 9px;
+}
+
+.auditAfter {
+  color: var(--text-primary);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.auditDelta {
+  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-align: right;
+}
