@@ -6,14 +6,13 @@ import { TwinView } from './components/TwinView/TwinView';
 import { FleetView } from './components/FleetView/FleetView';
 import { CSSView } from './components/CSSView/CSSView';
 import { SRPView } from './components/SRPView/SRPView';
-import { AICopilotView } from './components/AICopilotView/AICopilotView';
 import { ReportsView } from './components/ReportsView/ReportsView';
 import { DatabaseView } from './components/DatabaseView/DatabaseView';
 import { AnalyticsView } from './components/AnalyticsView/AnalyticsView';
 import { RightPanel } from './components/RightPanel/RightPanel';
 import './App.css';
 
-export type ActiveView = 'dashboard' | 'wells' | 'analytics' | 'css' | 'srp' | 'ai' | 'reports' | 'database';
+export type ActiveView = 'dashboard' | 'wells' | 'analytics' | 'css' | 'srp' | 'reports' | 'database';
 
 function AppContent() {
   const [activeView, setActiveView] = useState<ActiveView>('dashboard');
@@ -30,8 +29,6 @@ function AppContent() {
         return <CSSView />;
       case 'srp':
         return <SRPView />;
-      case 'ai':
-        return <AICopilotView />;
       case 'reports':
         return <ReportsView />;
       case 'database':

@@ -28,7 +28,6 @@ const navSections: { category: string; items: NavItem[] }[] = [
   {
     category: 'INTELLIGENCE',
     items: [
-      { id: 'ai', label: 'AI Copilot', badge: 'ADVISOR' },
       { id: 'reports', label: 'Surveillance Log', badge: 'DGH' },
     ],
   },
