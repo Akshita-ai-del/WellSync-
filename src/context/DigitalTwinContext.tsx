@@ -70,7 +70,7 @@ export interface AnomalyAlert {
   description: string;
   subsystem: 'Reservoir' | 'Wellbore' | 'SRP Lift' | 'Surface' | 'Thermal EOR';
   actionLabel: string;
-  actionPayload?: { type: string; value?: number };
+  actionPayload?: { type: string; value?: number; wellId?: string };
   timeAgo: string;
 }
 
@@ -256,6 +256,7 @@ export function DigitalTwinProvider({ children }: { children: React.ReactNode })
             subsystem: 'Reservoir',
             actionLabel: `Execute ${r.recommendationType || 'Action'}`,
             timeAgo: 'Just now',
+            actionPayload: { type: 'SET_RPM', value: r.recommendedValue, wellId: r.wellId }
           }))
         ];
 
@@ -297,12 +298,23 @@ export function DigitalTwinProvider({ children }: { children: React.ReactNode })
     setActiveWellId(newWell.id);
   }, []);
 
-  const applyAlertAction = useCallback((alert: AnomalyAlert) => {
-    // Actions will be routed to backend command API eventually
-    if (alert.actionPayload?.type === 'SET_SPM' && alert.actionPayload.value) {
-      updateControls({ pumpSpeed: alert.actionPayload.value });
+  const applyAlertAction = useCallback(async (alert: AnomalyAlert) => {
+    if (alert.actionPayload?.type && alert.actionPayload?.wellId) {
+      try {
+        await apiClient.post('/control-commands/execute-recommendation', {
+          wellId: alert.actionPayload.wellId,
+          commandType: alert.actionPayload.type,
+          requestedValue: alert.actionPayload.value,
+          unit: 'RPM',
+          source: 'OPERATOR',
+          status: 'PENDING'
+        });
+        setLastDashboardSyncNotice('Command sent to Simulator! System enters Recovery Mode.');
+      } catch (err) {
+        console.error('Failed to send command', err);
+      }
     }
-  }, [updateControls]);
+  }, []);
 
   return (
     <DigitalTwinContext.Provider
