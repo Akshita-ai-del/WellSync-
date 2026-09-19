@@ -139,7 +139,7 @@ export function DigitalTwinProvider({ children }: { children: React.ReactNode })
             
             backendWells.forEach((w, index: number) => {
               const i = index + 1;
-              const id = w.wellCode;
+              const id = w.id;
               
               let statusStr: WellStatus = 'Producing';
               if (w.status === 'ACTIVE') statusStr = 'Producing';
@@ -172,7 +172,7 @@ export function DigitalTwinProvider({ children }: { children: React.ReactNode })
           });
 
           if (backendWells.length > 0) {
-            setActiveWellId(backendWells[0].wellCode);
+            setActiveWellId(backendWells[0].id);
           }
         }
       } catch (err) {
