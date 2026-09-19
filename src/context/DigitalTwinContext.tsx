@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import apiClient from '../services/apiClient';
 
 export type WellStatus = 'Producing' | 'Optimization Alert' | 'Steam Soaking' | 'Shut-in / Workover';
@@ -183,10 +185,8 @@ export function DigitalTwinProvider({ children }: { children: React.ReactNode })
     fetchWellsFromBackend();
   }, []);
 
-  // Fetch Live Telemetry, Alerts, and AI Recommendations from Backend
+  // Fetch Initial State from Backend
   useEffect(() => {
-    let interval: number;
-
     const fetchLiveState = async () => {
       if (!isStreaming || !activeWellId) return;
 
@@ -269,11 +269,98 @@ export function DigitalTwinProvider({ children }: { children: React.ReactNode })
 
     if (isStreaming && activeWellId) {
       fetchLiveState(); // Initial fetch
-      interval = window.setInterval(fetchLiveState, 2000); // Poll every 2 seconds
     }
+  }, [isStreaming, activeWellId]);
+
+  // WebSocket (STOMP) integration for live updates
+  useEffect(() => {
+    if (!isStreaming || !activeWellId) return;
+
+    const client = new Client({
+      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      onConnect: () => {
+        // Subscribe to Telemetry updates
+        client.subscribe(`/topic/telemetry/${activeWellId}`, (message) => {
+          if (message.body) {
+            const data = JSON.parse(message.body);
+            setTelemetry((prev) => {
+              const merged: TelemetryData = {
+                timestamp: new Date().toISOString(),
+                porePressure: 120.0,
+                bottomholeFlowingPressure: 85.0,
+                reservoirTemperature: data.temperatureC || prev?.reservoirTemperature || 80.0,
+                gasOilRatio: 110,
+                waterCut: 5.2,
+                crudeViscosity: data.viscosityCp || prev?.crudeViscosity || 125.0,
+                tubingHeadPressure: 15.0,
+                casingHeadPressure: 90.0,
+                dynamicFluidLevel: 650.0,
+                bottomholeDrawdown: 35.0,
+                pumpSpeed: data.pumpRpm || prev?.pumpSpeed || 6.0,
+                strokeLength: 144,
+                pumpFillage: 82.5,
+                peakPolishedRodLoad: data.rodLoadLbs || prev?.peakPolishedRodLoad || 11000,
+                minPolishedRodLoad: 4500,
+                motorPower: 22.5,
+                motorCurrent: 35.0,
+                srpEfficiency: 81.0,
+                dynacardCondition: data.systemStatus || prev?.dynacardCondition || 'NORMAL',
+                grossRate: 155,
+                oilProductionRate: 146,
+                gasProductionRate: 28,
+                dailyCumulativeOil: 75.5,
+                steamTemp: 285.0,
+                steamZoneRadius: 12.0,
+                steamQuality: 75.0,
+                cumulativeOSR: 0.15,
+                ...data
+              };
+              return merged;
+            });
+          }
+        });
+
+        // Subscribe to Alerts updates
+        client.subscribe(`/topic/alerts/${activeWellId}`, (message) => {
+          if (message.body) {
+            const a = JSON.parse(message.body);
+            const newAlert: AnomalyAlert = {
+              id: a.id || String(Date.now()),
+              severity: a.severity?.toLowerCase() || 'warning',
+              title: a.title || 'System Alert',
+              description: a.description || 'Abnormal condition detected',
+              subsystem: 'SRP Lift',
+              actionLabel: 'Acknowledge',
+              timeAgo: 'Just now',
+            };
+            setAlerts((prev) => [newAlert, ...prev]);
+          }
+        });
+
+        // Subscribe to Recommendations updates
+        client.subscribe(`/topic/recommendations/${activeWellId}`, (message) => {
+          if (message.body) {
+            const r = JSON.parse(message.body);
+            const newRec: AnomalyAlert = {
+              id: r.id || String(Date.now() + 100),
+              severity: 'info',
+              title: 'AI Recommendation',
+              description: r.recommendationText || 'Operational adjustment advised',
+              subsystem: 'Reservoir',
+              actionLabel: `Execute ${r.recommendationType || 'Action'}`,
+              timeAgo: 'Just now',
+              actionPayload: { type: 'SET_RPM', value: r.recommendedValue, wellId: r.wellId }
+            };
+            setAlerts((prev) => [newRec, ...prev]);
+          }
+        });
+      },
+    });
+
+    client.activate();
 
     return () => {
-      if (interval) clearInterval(interval);
+      client.deactivate();
     };
   }, [isStreaming, activeWellId]);
 
