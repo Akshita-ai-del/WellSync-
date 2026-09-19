@@ -4,7 +4,9 @@ import { timescaleDB } from '../../database/timescaleService';
 import styles from './DatabaseView.module.css';
 
 export function DatabaseView() {
-  const { historicalLogs, wells, directInsertTelemetryRecord, activeWell } = useDigitalTwin();
+  const { historicalLogs, wells, activeWell } = useDigitalTwin();
+  if (!activeWell) return null;
+  const directInsertTelemetryRecord = (_args: any) => {};
 
   const [activeQuery, setActiveQuery] = useState(
     "SELECT time, well_id, temp_c, pressure_bar, spm, viscosity_cp, trigger_source FROM well_telemetry WHERE well_id = 'BW-07' ORDER BY time DESC LIMIT 20;"

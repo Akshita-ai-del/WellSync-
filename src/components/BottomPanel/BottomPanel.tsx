@@ -58,7 +58,16 @@ function Sparkline({
 }
 
 export function BottomPanel() {
-  const { telemetry, telemetryHistory } = useDigitalTwin();
+  const { activeWell, telemetry, telemetryHistory } = useDigitalTwin();
+
+  if (!telemetry || !activeWell) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', padding: '2rem', textAlign: 'center', color: '#888' }}>
+        No telemetry data available. Awaiting connection to Digital Twin backend.
+      </div>
+    );
+  }
+
   const [tab, setTab] = useState<'production' | 'pressure' | 'fluid' | 'power'>('production');
 
   // Derive historical streams from telemetryHistory

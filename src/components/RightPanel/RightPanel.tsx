@@ -2,7 +2,16 @@ import { useDigitalTwin } from '../../context/DigitalTwinContext';
 import styles from './RightPanel.module.css';
 
 export function RightPanel() {
-  const { telemetry, alerts, applyAlertAction, controls, updateControls } = useDigitalTwin();
+  const { activeWell, telemetry, alerts, applyAlertAction, controls, updateControls } = useDigitalTwin();
+
+  if (!telemetry || !activeWell) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', padding: '2rem', textAlign: 'center', color: '#888' }}>
+        No telemetry data available. Awaiting connection to Digital Twin backend.
+      </div>
+    );
+  }
+
 
   const kpis = [
     {

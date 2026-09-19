@@ -62,11 +62,10 @@ export function Sidebar({ active, onNavigate }: Props) {
                     key={item.id}
                     className={`${styles.item} ${isActive ? styles.active : ''}`}
                     onClick={() => onNavigate(item.id)}
-                    aria-current={isActive ? 'page' : undefined}
                   >
-                    <span className={styles.label}>{item.label}</span>
+                    <span>{item.label}</span>
                     {item.badge && (
-                      <span className={`${styles.badge} ${isActive ? styles.badgeActive : ''}`}>
+                      <span className={`${styles.badge} ${isActive ? styles.activeBadge : ''}`}>
                         {item.badge}
                       </span>
                     )}
@@ -78,11 +77,11 @@ export function Sidebar({ active, onNavigate }: Props) {
         ))}
       </div>
 
-      <div className={styles.wellFooter}>
-        <div className={styles.wellCard}>
-          <span className={styles.wellLabel}>CURRENT TWIN</span>
-          <span className={styles.wellName}>{activeWell.name}</span>
-          <span className={styles.wellDepth}>{activeWell.targetDepth}m · {telemetry.oilProductionRate} bbl/d</span>
+      <div className={styles.wellIndicator}>
+        <div className={styles.wellIcon}>🛢️</div>
+        <div className={styles.wellInfo}>
+          <span className={styles.wellName}>{activeWell?.name || 'No Active Well'}</span>
+          <span className={styles.wellDepth}>{activeWell?.targetDepth || 0}m · {telemetry?.oilProductionRate || '-'} bbl/d</span>
         </div>
       </div>
     </nav>

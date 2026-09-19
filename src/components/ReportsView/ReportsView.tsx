@@ -4,6 +4,15 @@ import styles from './ReportsView.module.css';
 
 export function ReportsView() {
   const { telemetry, activeWell, alerts, historicalLogs } = useDigitalTwin();
+
+  if (!telemetry || !activeWell) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', padding: '2rem', textAlign: 'center', color: '#888' }}>
+        No telemetry data available. Awaiting connection to Digital Twin backend.
+      </div>
+    );
+  }
+
   const [copied, setCopied] = useState(false);
   const [selectedWellFilter, setSelectedWellFilter] = useState<string>('all');
   const [logSearch, setLogSearch] = useState('');
@@ -176,7 +185,7 @@ ${filteredLogs
               </thead>
               <tbody>
                 {filteredLogs.map((log) => (
-                  <tr key={log.id}>
+                  <tr key={log.time}>
                     <td className={styles.wellIdCell}>{log.wellId}</td>
                     <td className={styles.monoCell}>{log.time}</td>
                     <td className={styles.tempCell}>{log.temperature} °C</td>

@@ -81,7 +81,7 @@ export function FleetView() {
           <div className={styles.statBox}>
             <span className={styles.statLabel}>Active Digital Twin</span>
             <span className={styles.statNum} style={{ color: 'var(--accent)' }}>
-              {activeWell.id}
+              {activeWell?.id}
             </span>
           </div>
         </div>
@@ -147,7 +147,7 @@ export function FleetView() {
       {/* Grid of 52 Wells */}
       <div className={styles.grid}>
         {filteredWells.map((well) => {
-          const isActive = well.id === activeWell.id;
+          const isActive = well.id === activeWell?.id;
           const statusClass =
             well.status === 'Producing'
               ? styles.statusGreen
@@ -326,7 +326,7 @@ export function FleetView() {
         <div className={styles.spotlightHeader}>
           <div className={styles.spotlightTitle}>
             <span className={styles.livePulse} />
-            <span>Active Real-Time Telemetry Feed: {activeWell.name}</span>
+            <span>Active Real-Time Telemetry Feed: {activeWell?.name || 'No Active Well'}</span>
           </div>
           <span className={styles.syncRate}>Telemetry rate: 1.8s · Coupled Multiphysics Loop</span>
         </div>
@@ -335,30 +335,30 @@ export function FleetView() {
           <div className={styles.spotBox}>
             <span className={styles.spotLabel}>Pore Pressure ($P_{'{'}res{'}'}$)</span>
             <span className={styles.spotValue} style={{ color: 'var(--yellow)' }}>
-              {telemetry.porePressure} <small>bar</small>
+              {telemetry?.porePressure || '-'} <small>bar</small>
             </span>
-            <span className={styles.spotSub}>BHP Drawdown: {telemetry.bottomholeDrawdown} bar</span>
+            <span className={styles.spotSub}>BHP Drawdown: {telemetry?.bottomholeDrawdown || '-'} bar</span>
           </div>
           <div className={styles.spotBox}>
             <span className={styles.spotLabel}>Tubing Head (THP)</span>
             <span className={styles.spotValue} style={{ color: 'var(--accent)' }}>
-              {telemetry.tubingHeadPressure} <small>bar</small>
+              {telemetry?.tubingHeadPressure || '-'} <small>bar</small>
             </span>
-            <span className={styles.spotSub}>Casing (CHP): {telemetry.casingHeadPressure} bar</span>
+            <span className={styles.spotSub}>Casing (CHP): {telemetry?.casingHeadPressure || '-'} bar</span>
           </div>
           <div className={styles.spotBox}>
             <span className={styles.spotLabel}>Dynamic Liquid Level</span>
             <span className={styles.spotValue} style={{ color: 'var(--green)' }}>
-              {telemetry.dynamicFluidLevel} <small>m</small>
+              {telemetry?.dynamicFluidLevel || '-'} <small>m</small>
             </span>
-            <span className={styles.spotSub}>Pump Fillage: {telemetry.pumpFillage}%</span>
+            <span className={styles.spotSub}>Pump Fillage: {telemetry?.pumpFillage || '-'}%</span>
           </div>
           <div className={styles.spotBox}>
             <span className={styles.spotLabel}>Artificial Lift Speed</span>
             <span className={styles.spotValue} style={{ color: 'var(--purple)' }}>
-              {telemetry.pumpSpeed} <small>SPM</small>
+              {telemetry?.pumpSpeed || '-'} <small>SPM</small>
             </span>
-            <span className={styles.spotSub}>Motor Power: {telemetry.motorPower} kW</span>
+            <span className={styles.spotSub}>Motor Power: {telemetry?.motorPower || '-'} kW</span>
           </div>
         </div>
       </div>

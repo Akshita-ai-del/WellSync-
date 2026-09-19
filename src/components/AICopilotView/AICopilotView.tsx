@@ -6,6 +6,15 @@ import styles from './AICopilotView.module.css';
 export function AICopilotView() {
   const { telemetry, activeWell, controls, updateControls, addNewWell } = useDigitalTwin();
 
+  if (!telemetry || !activeWell) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', padding: '2rem', textAlign: 'center', color: '#888' }}>
+        No telemetry data available. Awaiting connection to Digital Twin backend.
+      </div>
+    );
+  }
+
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',

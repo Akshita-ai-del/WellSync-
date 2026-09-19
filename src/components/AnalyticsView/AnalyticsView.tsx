@@ -165,6 +165,15 @@ function TimeSeriesChart({
 
 export function AnalyticsView() {
   const { wells, activeWell, setActiveWellId, historicalLogs, telemetry } = useDigitalTwin();
+
+  if (!telemetry || !activeWell) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', padding: '2rem', textAlign: 'center', color: '#888' }}>
+        No telemetry data available. Awaiting connection to Digital Twin backend.
+      </div>
+    );
+  }
+
   const [selectedWellId, setSelectedWellId] = useState<string>(activeWell.id);
 
   const selectedWell = wells[selectedWellId] || activeWell;

@@ -72,9 +72,9 @@ export interface AppState {
 
 /** Common audit fields present on every backend entity. */
 export interface BaseEntity {
-  id: number;
-  createdAt: string; // ISO 8601
-  updatedAt: string; // ISO 8601
+  id: string; // UUID
+  createdAt?: string; // ISO 8601
+  updatedAt?: string; // ISO 8601
 }
 
 // --- Reservoir ---
@@ -83,34 +83,28 @@ export interface Reservoir extends BaseEntity {
   name: string;
   formation: string;
   lithology: string;
-  depthTopFt: number;
-  depthBottomFt: number;
-  netPayFt: number;
-  porosity: number;
-  permeabilityMd: number;
-  oilGravityApi: number;
-  viscosityCp: number;
+  apiGravity: number;
+  initialTemperatureC: number;
   initialPressurePsi: number;
-  temperatureF: number;
-  driveType: string;
+  oilViscosityCp: number;
+  porosityPercent: number;
+  permeabilityMd: number;
+  depthM: number;
 }
 
 export type ReservoirPayload = Omit<Reservoir, 'id' | 'createdAt' | 'updatedAt'>;
 
 // --- Well ---
 
-export type WellStatus = 'ACTIVE' | 'SHUT_IN' | 'ABANDONED' | 'DRILLING' | 'COMPLETING';
+export type BackendWellStatus = 'ACTIVE' | 'SHUTDOWN' | 'MAINTENANCE' | 'INACTIVE';
 
 export interface Well extends BaseEntity {
   wellCode: string;
   wellName: string;
-  reservoirId: number;
-  status: WellStatus;
-  spudDate: string;
-  completionDate: string;
-  totalDepthFt: number;
-  latitude: number;
-  longitude: number;
+  fieldName: string;
+  location: string;
+  reservoirId: string;
+  status: BackendWellStatus;
 }
 
 export type WellPayload = Omit<Well, 'id' | 'createdAt' | 'updatedAt'>;
@@ -118,15 +112,13 @@ export type WellPayload = Omit<Well, 'id' | 'createdAt' | 'updatedAt'>;
 // --- Completion ---
 
 export interface Completion extends BaseEntity {
-  wellId: number;
+  wellId: string;
   completionType: string;
-  tubingDepthFt: number;
-  tubingSizIn: number;
-  casingSizeIn: number;
-  casingWeightLbPerFt: number;
-  perforationTopFt: number;
-  perforationBottomFt: number;
-  openHole: boolean;
+  tubingDepth: number;
+  casingDepth: number;
+  perforationTop: number;
+  perforationBottom: number;
+  pumpSettingDepth: number;
 }
 
 export type CompletionPayload = Omit<Completion, 'id' | 'createdAt' | 'updatedAt'>;
@@ -134,16 +126,17 @@ export type CompletionPayload = Omit<Completion, 'id' | 'createdAt' | 'updatedAt
 // --- SRP System ---
 
 export interface SrpSystem extends BaseEntity {
-  wellId: number;
+  wellId: string;
   pumpType: string;
-  manufacturer: string;
-  pumpDepthFt: number;
-  pumpBoreSizeIn: number;
-  plungerSizeIn: number;
-  strokeLengthIn: number;
-  rodStringDescription: string;
-  motorHp: number;
-  motorType: string;
+  pumpModel: string;
+  rodType: string;
+  rodStringLength: number;
+  pumpDepth: number;
+  minRpm: number;
+  maxRpm: number;
+  maxStrokeLength: number;
+  maxRodLoad: number;
+  status: BackendWellStatus;
 }
 
 export type SrpSystemPayload = Omit<SrpSystem, 'id' | 'createdAt' | 'updatedAt'>;
@@ -151,31 +144,31 @@ export type SrpSystemPayload = Omit<SrpSystem, 'id' | 'createdAt' | 'updatedAt'>
 // --- SRP Operating Config ---
 
 export interface SrpOperatingConfig extends BaseEntity {
-  srpSystemId: number;
-  strokesPerMinute: number;
-  effectiveStrokeLengthIn: number;
-  pumpFillage: number;
-  polishedRodLoadMax: number;
-  polishedRodLoadMin: number;
-  gearboxTorque: number;
-  motorLoad: number;
+  srpSystemId: string;
+  strokeLength: number;
+  spm: number;
+  pumpRpm: number;
+  vfdFrequency: number;
+  targetRpm: number;
+  pumpEfficiencyPercent: number;
 }
 
 export type SrpOperatingConfigPayload = Omit<SrpOperatingConfig, 'id' | 'createdAt' | 'updatedAt'>;
 
 // --- CSS Cycle ---
 
-export type CssCycleStatus = 'INJECTION' | 'SOAK' | 'PRODUCTION' | 'COMPLETED';
+export type CssStage = 'INJECTION' | 'SOAK' | 'PRODUCTION';
+export type CssCycleStatus = 'PLANNED' | 'ACTIVE' | 'COMPLETED' | 'SUSPENDED';
 
 export interface CssCycle extends BaseEntity {
-  wellId: number;
+  wellId: string;
   cycleNumber: number;
+  stage: CssStage;
   status: CssCycleStatus;
-  startDate: string;
-  endDate: string | null;
-  injectionDays: number;
-  soakDays: number;
-  productionDays: number;
+  soakTimeMinutes: number;
+  startTime: string;
+  endTime: string | null;
+  notes: string;
 }
 
 export type CssCyclePayload = Omit<CssCycle, 'id' | 'createdAt' | 'updatedAt'>;
@@ -183,31 +176,33 @@ export type CssCyclePayload = Omit<CssCycle, 'id' | 'createdAt' | 'updatedAt'>;
 // --- Steam Injection ---
 
 export interface SteamInjection extends BaseEntity {
-  cssCycleId: number;
-  injectionDate: string;
-  volumeColdWaterEquivalent: number;
-  steamQuality: number;
+  cssCycleId: string;
+  steamRateKgHr: number;
+  steamVolumeKg: number;
+  steamTemperatureC: number;
   injectionPressurePsi: number;
-  injectionTemperatureF: number;
-  injectionRateBpd: number;
+  injectionDurationMinutes: number;
+  steamQualityPercent: number;
+  startTime: string;
+  endTime: string;
 }
 
 export type SteamInjectionPayload = Omit<SteamInjection, 'id' | 'createdAt' | 'updatedAt'>;
 
 // --- Sensor Config ---
 
-export type SensorType = 'PRESSURE' | 'TEMPERATURE' | 'FLOW_RATE' | 'VIBRATION' | 'LOAD';
+export type SensorType = 'TEMPERATURE' | 'PRESSURE' | 'VISCOSITY' | 'FLOW_RATE' | 'LOAD' | 'VIBRATION' | 'RPM';
 
 export interface SensorConfig extends BaseEntity {
-  wellId: number;
+  wellId: string;
   sensorCode: string;
-  sensorType: SensorType;
-  manufacturer: string;
-  model: string;
-  installationDepthFt: number;
-  installDate: string;
+  sensorType: SensorType | string;
+  unit: string;
+  minValue: number;
+  maxValue: number;
+  samplingIntervalSeconds: number;
   isActive: boolean;
-  readingIntervalSeconds: number;
+  lastSeenAt: string | null;
 }
 
 export type SensorConfigPayload = Omit<SensorConfig, 'id' | 'createdAt' | 'updatedAt'>;
@@ -215,13 +210,15 @@ export type SensorConfigPayload = Omit<SensorConfig, 'id' | 'createdAt' | 'updat
 // --- Well Target ---
 
 export interface WellTarget extends BaseEntity {
-  wellId: number;
+  wellId: string;
+  minRpm: number;
+  maxRpm: number;
+  targetRpm: number;
+  minTemperatureC: number;
+  maxViscosityCp: number;
+  maxRodLoadLbs: number;
   targetOilRateBopd: number;
-  targetWaterRateBwpd: number;
-  targetGasRateMcfd: number;
-  targetWaterCutPct: number;
-  effectiveFrom: string;
-  effectiveTo: string | null;
+  maxEnergyKwh: number;
 }
 
 export type WellTargetPayload = Omit<WellTarget, 'id' | 'createdAt' | 'updatedAt'>;
@@ -229,17 +226,16 @@ export type WellTargetPayload = Omit<WellTarget, 'id' | 'createdAt' | 'updatedAt
 // --- Production Record ---
 
 export interface ProductionRecord extends BaseEntity {
-  wellId: number;
+  wellId: string;
   recordedAt: string;
   oilRateBopd: number;
   waterRateBwpd: number;
-  gasRateMcfd: number;
-  waterCutPct: number;
-  casingPressurePsi: number;
-  tubingPressurePsi: number;
-  bottomholePressurePsi: number;
-  chokeSize: number;
-  runtime: number;
+  gasRateMscfd: number;
+  waterCutPercent: number;
+  steamOilRatio: number;
+  energyConsumptionKwh: number;
+  pumpEfficiencyPercent: number;
 }
 
 export type ProductionRecordPayload = Omit<ProductionRecord, 'id' | 'createdAt' | 'updatedAt'>;
+

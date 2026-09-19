@@ -4,6 +4,7 @@ import styles from './TopBar.module.css';
 
 export function TopBar() {
   const { activeWell, telemetry, isStreaming, setIsStreaming } = useDigitalTwin();
+  
   const [clock, setClock] = useState('');
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export function TopBar() {
         <div className={styles.breadcrumb}>
           <span className={styles.bcItem}>ONGC Rajasthan</span>
           <span className={styles.bcSep}>/</span>
-          <span className={styles.bcItem}>{activeWell.name}</span>
+          <span className={styles.bcItem}>{activeWell?.name || 'No Well'}</span>
           <span className={styles.bcSep}>/</span>
           <span className={styles.bcActive}>Multiphysics Twin</span>
         </div>
@@ -38,28 +39,28 @@ export function TopBar() {
         <div className={styles.statPill}>
           <span className={styles.statLabel}>PORE PRESSURE</span>
           <span className={styles.statVal} style={{ color: 'var(--yellow)' }}>
-            {telemetry.porePressure} <small>bar</small>
+            {telemetry?.porePressure || '-'} <small>bar</small>
           </span>
         </div>
 
         <div className={styles.statPill}>
           <span className={styles.statLabel}>FLOW RATE</span>
           <span className={styles.statVal} style={{ color: 'var(--green)' }}>
-            {telemetry.oilProductionRate} <small>bbl/d</small>
+            {telemetry?.oilProductionRate || '-'} <small>bbl/d</small>
           </span>
         </div>
 
         <div className={styles.statPill}>
           <span className={styles.statLabel}>GOR</span>
           <span className={styles.statVal} style={{ color: 'var(--accent)' }}>
-            {telemetry.gasOilRatio} <small>scf/bbl</small>
+            {telemetry?.gasOilRatio || '-'} <small>scf/bbl</small>
           </span>
         </div>
 
         <div className={styles.statPill}>
           <span className={styles.statLabel}>FLUID LEVEL</span>
           <span className={styles.statVal}>
-            {telemetry.dynamicFluidLevel} <small>m</small>
+            {telemetry?.dynamicFluidLevel || '-'} <small>m</small>
           </span>
         </div>
 

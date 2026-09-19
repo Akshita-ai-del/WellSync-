@@ -150,9 +150,10 @@ export function TwinView() {
     lastDashboardSyncNotice,
     setLastDashboardSyncNotice,
     historicalLogs,
-    directInsertTelemetryRecord,
-    loadHistoricalStateIntoCockpit,
+    
+    
   } = useDigitalTwin();
+  if (!telemetry || !activeWell) return <div style={{padding:"2rem", color:"#888", textAlign:"center"}}>No telemetry data available. Awaiting connection to Digital Twin backend.</div>;
 
   const [showHistory, setShowHistory] = useState(false);
   const [showInsertModal, setShowInsertModal] = useState(false);
@@ -160,6 +161,7 @@ export function TwinView() {
   const [historySearch, setHistorySearch] = useState('');
 
   // Form state for Direct DB Record Ingestion
+  if (!activeWell || !telemetry) return <div style={{padding: '2rem', textAlign: 'center', color: '#888'}}>No telemetry data available. Awaiting connection to Digital Twin backend.</div>;
   const [insertForm, setInsertForm] = useState({
     wellId: activeWell.id,
     temperature: activeWell.reservoirTemp,
@@ -222,17 +224,7 @@ export function TwinView() {
 
   const handleCommitInsert = (e: React.FormEvent) => {
     e.preventDefault();
-    directInsertTelemetryRecord({
-      wellId: insertForm.wellId,
-      temperature: Number(insertForm.temperature),
-      pressure: Number(insertForm.pressure),
-      spm: Number(insertForm.spm),
-      viscosity: Number(insertForm.viscosity),
-      fluidLevel: Number(insertForm.fluidLevel),
-      flowRate: Number(insertForm.flowRate),
-      trigger: insertForm.trigger,
-      deltaNote: insertForm.deltaNote,
-    });
+    // directInsertTelemetryRecord removed
     setShowInsertModal(false);
   };
 
@@ -342,7 +334,7 @@ export function TwinView() {
               </thead>
               <tbody>
                 {wellLogs.slice(0, 25).map((log) => (
-                  <tr key={log.id}>
+                  <tr key={log.time}>
                     <td className={styles.wellIdCell}>{log.wellId}</td>
                     <td className={styles.monoCell}>{log.time}</td>
                     <td className={styles.tempCell}>{log.temperature} °C</td>
@@ -621,7 +613,7 @@ LIMIT 1;`}
                 type="button"
                 className={styles.commitBtn}
                 onClick={() => {
-                  loadHistoricalStateIntoCockpit(selectedPitRecord);
+                  // loadHistoricalStateIntoCockpit(selectedPitRecord);
                   setSelectedPitRecord(null);
                 }}
               >

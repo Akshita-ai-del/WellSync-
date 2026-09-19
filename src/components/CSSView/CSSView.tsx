@@ -4,6 +4,15 @@ import styles from './CSSView.module.css';
 
 export function CSSView() {
   const { activeWell, telemetry, controls, updateControls } = useDigitalTwin();
+
+  if (!telemetry || !activeWell) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', padding: '2rem', textAlign: 'center', color: '#888' }}>
+        No telemetry data available. Awaiting connection to Digital Twin backend.
+      </div>
+    );
+  }
+
   const [steamTemp, setSteamTemp] = useState(285);
   const [steamRate, setSteamRate] = useState(150);
 

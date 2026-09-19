@@ -3,7 +3,16 @@ import { useDigitalTwin } from '../../context/DigitalTwinContext';
 import styles from './SRPView.module.css';
 
 export function SRPView() {
-  const { telemetry, controls, updateControls } = useDigitalTwin();
+  const { activeWell, telemetry, controls, updateControls } = useDigitalTwin();
+
+  if (!telemetry || !activeWell) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', padding: '2rem', textAlign: 'center', color: '#888' }}>
+        No telemetry data available. Awaiting connection to Digital Twin backend.
+      </div>
+    );
+  }
+
   const [strokePhase, setStrokePhase] = useState(0); // 0 to 1 cycle
 
   // Reciprocating stroke cycle animation (0 to 2PI)
