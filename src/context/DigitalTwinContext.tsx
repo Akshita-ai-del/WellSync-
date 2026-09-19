@@ -111,10 +111,11 @@ export function DigitalTwinProvider({ children }: { children: React.ReactNode })
   const [lastDashboardSyncNotice, setLastDashboardSyncNotice] = useState<string | null>(null);
 
   // Awaiting backend websocket integration for these values
-  const [telemetry] = useState<TelemetryData | null>(null);
+  // State for live telemetry and alerts
+  const [telemetry, setTelemetry] = useState<TelemetryData | null>(null);
   const [telemetryHistory] = useState<TelemetryData[]>([]);
   const [historicalLogs] = useState<HistoricalTelemetryRecord[]>([]);
-  const [alerts] = useState<AnomalyAlert[]>([]);
+  const [alerts, setAlerts] = useState<AnomalyAlert[]>([]);
 
   const [controls, setControls] = useState<ScenarioControls>({
     pumpSpeed: 6.2,
@@ -181,6 +182,99 @@ export function DigitalTwinProvider({ children }: { children: React.ReactNode })
 
     fetchWellsFromBackend();
   }, []);
+
+  // Fetch Live Telemetry, Alerts, and AI Recommendations from Backend
+  useEffect(() => {
+    let interval: number;
+
+    const fetchLiveState = async () => {
+      if (!isStreaming || !activeWellId) return;
+
+      try {
+        // Fetch Telemetry State
+        const resTel = await apiClient.get<any>(`/telemetry/state/${activeWellId}`);
+        const data = resTel.data;
+        
+        if (data) {
+          const mappedTelemetry: TelemetryData = {
+            timestamp: new Date().toISOString(),
+            porePressure: 120.0, // Mocked for now
+            bottomholeFlowingPressure: 85.0, // Mocked for now
+            reservoirTemperature: data.temperatureC || 80.0,
+            gasOilRatio: 110,
+            waterCut: 5.2,
+            crudeViscosity: data.viscosityCp || 125.0,
+            tubingHeadPressure: 15.0,
+            casingHeadPressure: 90.0,
+            dynamicFluidLevel: 650.0,
+            bottomholeDrawdown: 35.0,
+            pumpSpeed: data.pumpRpm || 6.0,
+            strokeLength: 144,
+            pumpFillage: 82.5,
+            peakPolishedRodLoad: data.rodLoadLbs || 11000,
+            minPolishedRodLoad: 4500,
+            motorPower: 22.5,
+            motorCurrent: 35.0,
+            srpEfficiency: 81.0,
+            dynacardCondition: data.systemStatus || 'NORMAL',
+            grossRate: 155,
+            oilProductionRate: 146,
+            gasProductionRate: 28,
+            dailyCumulativeOil: 75.5,
+            steamTemp: 285.0,
+            steamZoneRadius: 12.0,
+            steamQuality: 75.0,
+            cumulativeOSR: 0.15,
+          };
+          setTelemetry(mappedTelemetry);
+        }
+
+        // Fetch Alerts
+        const resAlerts = await apiClient.get<any[]>(`/alerts?wellId=${activeWellId}`);
+        const unackedAlerts = (resAlerts.data || []).filter((a) => !a.acknowledgedBy);
+        
+        // Fetch Recommendations
+        const resRecs = await apiClient.get<any[]>(`/recommendations?wellId=${activeWellId}`);
+        const pendingRecs = (resRecs.data || []).filter((r) => r.status === 'PENDING');
+
+        // Merge and Map to AnomalyAlert interface
+        const mergedAlerts = [
+          ...unackedAlerts.map(a => ({
+            id: a.id || String(Date.now()),
+            severity: a.severity?.toLowerCase() || 'warning',
+            title: a.title || 'System Alert',
+            description: a.description || 'Abnormal condition detected',
+            subsystem: 'SRP Lift',
+            actionLabel: 'Acknowledge',
+            timeAgo: 'Just now',
+          })),
+          ...pendingRecs.map(r => ({
+            id: r.id || String(Date.now() + 100),
+            severity: 'info',
+            title: 'AI Recommendation',
+            description: r.recommendationText || 'Operational adjustment advised',
+            subsystem: 'Reservoir',
+            actionLabel: `Execute ${r.recommendationType || 'Action'}`,
+            timeAgo: 'Just now',
+          }))
+        ];
+
+        setAlerts(mergedAlerts as AnomalyAlert[]);
+
+      } catch (err) {
+        console.error('Failed to fetch live state from backend:', err);
+      }
+    };
+
+    if (isStreaming && activeWellId) {
+      fetchLiveState(); // Initial fetch
+      interval = window.setInterval(fetchLiveState, 2000); // Poll every 2 seconds
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isStreaming, activeWellId]);
 
   const activeWell = activeWellId ? wells[activeWellId] || null : null;
 
