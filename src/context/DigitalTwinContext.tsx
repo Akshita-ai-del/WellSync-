@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { timescaleDB, type TimescaleTelemetryRecord } from '../database/timescaleService';
+import apiClient from '../services/apiClient';
 
 export type WellStatus = 'Producing' | 'Optimization Alert' | 'Steam Soaking' | 'Shut-in / Workover';
 
@@ -185,6 +186,66 @@ export function DigitalTwinProvider({ children }: { children: React.ReactNode })
     }
   }, [wells]);
 
+  // Fetch real wells from Spring Boot backend on mount
+  useEffect(() => {
+    const fetchWellsFromBackend = async () => {
+      try {
+        // GET /api/v1/wells
+        const res = await apiClient.get('/wells');
+        const backendWells = res.data;
+        
+        if (backendWells && backendWells.length > 0) {
+          setWells(() => {
+            const map: Record<string, WellConfig> = {};
+            
+            backendWells.forEach((w: any, index: number) => {
+              const i = index + 1;
+              const id = w.wellCode; // e.g. BGH-001
+              
+              // Map backend enum status to frontend visual status
+              let statusStr: WellStatus = 'Producing';
+              if (w.status === 'ACTIVE') statusStr = 'Producing';
+              else if (w.status === 'SHUTDOWN') statusStr = 'Shut-in / Workover';
+              else if (w.status === 'MAINTENANCE') statusStr = 'Optimization Alert';
+              else if (w.status === 'INACTIVE') statusStr = 'Steam Soaking';
+
+              const depth = 2750 + ((i * 31) % 190);
+              const temp = statusStr === 'Steam Soaking' ? +(110.0 + ((i * 5) % 18)).toFixed(1) : +(76.0 + ((i * 3) % 8)).toFixed(1);
+              const viscosity = statusStr === 'Steam Soaking' ? 38 : 125 + ((i * 11) % 55);
+              const targetRate = statusStr === 'Shut-in / Workover' ? 0 : +(32 + ((i * 7) % 24)).toFixed(1);
+
+              map[id] = {
+                id,
+                name: w.wellName,
+                field: w.fieldName,
+                block: w.location || 'Rajasthan Block',
+                status: statusStr,
+                liftMethod: 'SRP (Sucker Rod Pump)',
+                targetDepth: depth,
+                reservoirTemp: temp,
+                oilGravity: '17.2° API (Extra Heavy)',
+                baselineViscosity: viscosity,
+                targetRate,
+                cssCycle: (i % 4) + 1,
+              };
+            });
+            
+            return map;
+          });
+
+          // Automatically set active well to the first loaded well (BGH-001)
+          if (backendWells.length > 0) {
+            setActiveWellId(backendWells[0].wellCode);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch wells from Spring Boot API:', err);
+      }
+    };
+
+    fetchWellsFromBackend();
+  }, []);
+
   const [activeWellId, setActiveWellId] = useState<string>('BW-07');
 
   const [isStreaming, setIsStreaming] = useState(true);
@@ -202,7 +263,21 @@ export function DigitalTwinProvider({ children }: { children: React.ReactNode })
     steamRate: 150,
   });
 
-  const activeWell = wells[activeWellId] || wells['BW-07'];
+  const activeWell = wells[activeWellId] || wells['BW-07'] || Object.values(wells)[0] || {
+    id: 'BW-07',
+    name: 'Fallback Well',
+    field: '',
+    block: '',
+    status: 'Producing',
+    liftMethod: 'SRP (Sucker Rod Pump)',
+    targetDepth: 2000,
+    reservoirTemp: 80,
+    oilGravity: '17',
+    baselineViscosity: 100,
+    targetRate: 50,
+    cssCycle: 1,
+  };
+
 
   // Base physics calculations linked together in a continuous feedback loop:
   // Reservoir -> Wellbore -> SRP -> Surface
